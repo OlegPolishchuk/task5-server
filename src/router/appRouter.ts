@@ -6,10 +6,14 @@ export const appRouter = Router({});
 
 appRouter.get('/', async (req, res) => {
   // @ts-ignore
-  const {currentRegion, errorCount, seed, pageNumber}: DataQueryParams = req.query;
+  const {region, errorsCount, seed, pageNumber}: DataQueryParams = req.query;
   const itemsCount = Number(pageNumber) === 0 ? 20 : 10;
 
-  const data = userService.getUsers(itemsCount, currentRegion.locale);
+  const currentSeed = Number(seed) + Number(pageNumber);
+
+  userService.setLocale(region);
+  userService.setSeed(currentSeed);
+  const data = userService.getUsers(itemsCount, errorsCount, region);
 
   res.status(200).json(data)
 })

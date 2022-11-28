@@ -1,119 +1,99 @@
-import {faker } from "@faker-js/faker";
+import {faker} from "@faker-js/faker";
 import {User} from "../types";
-
-// export const userService = (locale: string) => {
-//   faker.setLocale(locale)
-//
-//   const data: User[] = [];
-//
-//   for (let i = 0; i < 5; i++) {
-//     console.log(locale)
-//     // console.log(faker.address.country())
-//     console.log(faker.address.city())
-//     console.log(faker.name.firstName())
-//
-//     const user = {
-//       id: faker.datatype.uuid(),
-//       name: {
-//         firstName: faker.name.firstName(),
-//         lastName: faker.name.lastName(),
-//       },
-//       address: {
-//         country: faker.address.country(),
-//         city: faker.address.city(),
-//         street: faker.address.street(),
-//         timeZone: faker.address.timeZone(),
-//         zipCode: faker.address.timeZone(),
-//       },
-//       phoneNumber: faker.phone.number(),
-//     }
-//   console.log(user)
-//     data.push(user)
-//   }
-//   return data;
-// }
+import {removeRandomChar} from '../utils/removeRandomChar';
+import {addRandomChar} from "../utils/addRandomChar";
+import {shuffleChar} from "../utils/shuffleChar";
+import {getRandomDigit} from "../utils/getRandomDigit";
 
 
-faker.locale = ('ru')
-console.log(faker.name.fullName(), faker.name.firstName(), faker.address.state(), faker.address.city())
-console.log(faker.name.fullName(), faker.name.firstName(), faker.address.state(), faker.address.city())
-console.log(faker.name.fullName(), faker.name.firstName(), faker.address.state(), faker.address.city())
-console.log(faker.name.fullName(), faker.name.firstName(), faker.address.state(), faker.address.city())
-console.log(faker.name.fullName(), faker.name.firstName(), faker.address.state(), faker.address.city())
-
-// faker.locale = ('de')
-// console.log(faker.name.fullName(), faker.address.state(), faker.address.city())
-//
-// faker.locale = ('fr')
-// console.log(faker.name.fullName(), faker.address.state(), faker.address.city())
-
-
-// faker.locale = ('ru');
-// for (let i = 0; i < 10; i++) {
-//   console.log(`${faker.name.firstName()} ${faker.name.lastName()} ${faker.address.country()} ${faker.address.city()}`)
-//   console.log(' //////////////')
-// }
-
-// export const userService = (locale: string, itemsCount: number) => {
-//   // faker.locale = ('ru')
-//   faker.setLocale('ru')
-//   const result = [];
-//
-//   for (let i = 0; i < itemsCount; i++) {
-//     result.push({
-//         id: faker.datatype.uuid(),
-//         name: {
-//           firstName: faker.name.firstName(),
-//           lastName: faker.name.lastName(),
-//         },
-//         address: {
-//           country: faker.address.country(),
-//           city: faker.address.city(),
-//           street: faker.address.street(),
-//           timeZone: faker.address.timeZone(),
-//           zipCode: faker.address.timeZone(),
-//         },
-//         phoneNumber: faker.phone.number(),
-//       }
-//     )
-//   }
-//
-//   return result
-// }
-
+const permissibleErrors: Array<(string: string, locale: string) => string> = [shuffleChar, removeRandomChar, addRandomChar];
+const locales: {[key: string]: string} = {
+  'Russia' : 'ru',
+  'USA': 'en_US',
+  'Ukraine': 'uk',
+  'Poland': 'pl',
+  'Germany': 'de',
+  'Japan': 'ja',
+}
 
 export const userService = {
 
-  createRandomUser: (): User => {
+  createRandomUser: (errorsCount: number, locale: string): User => {
+    let address = `${faker.address.city()} ${faker.address.streetName()}`;
+    let name = faker.name.fullName();
+    let phoneNumber = faker.phone.number();
+
+    if (errorsCount > 0) {
+      const min = 0;
+      const max = errorsCount;
+      const permErrorsLength = permissibleErrors.length - 1;
+
+      if (max % Math.floor(max) === 0) {
+        console.log(`${max} % ${max} === 0`, max % max)
+        console.log('errors count without 0.5')
+        for (let i = 0; i < max; i++) {
+          const randomIndex = getRandomDigit(0, permErrorsLength);
+            name = permissibleErrors[randomIndex](name, locale);
+            address = permissibleErrors[randomIndex](address, locale);
+            phoneNumber = permissibleErrors[randomIndex](phoneNumber, locale);
+        }
+      }
+      else {
+        const max = errorsCount - 0.5;
+        const randomIndexForErrorVariant = getRandomDigit(0, permErrorsLength);
+
+        if (max > 0) {
+          for (let i = 0; i < max; i++) {
+            const randomIndex = getRandomDigit(0, permErrorsLength);
+            name = permissibleErrors[randomIndex](name, locale);
+            address = permissibleErrors[randomIndex](address, locale);
+            phoneNumber = permissibleErrors[randomIndex](phoneNumber, locale);
+          }
+        }
+        else {
+          name = getRandomDigit(0,1)
+            ? permissibleErrors[randomIndexForErrorVariant](name, locale)
+            : name;
+
+          address = getRandomDigit(0,1)
+            ? permissibleErrors[randomIndexForErrorVariant](address, locale)
+            : address;
+
+          phoneNumber = getRandomDigit(0,1)
+            ? permissibleErrors[randomIndexForErrorVariant](phoneNumber, locale)
+            : phoneNumber;
+        }
+      }
+
+    }
+
     return {
       id: faker.datatype.uuid(),
-      name: faker.name.fullName(),
-      address: {
-        country: faker.address.country(),
-        city: faker.address.city(),
-        street: faker.address.street(),
-        timeZone: faker.address.timeZone(),
-        zipCode: faker.address.timeZone(),
-      },
-      phoneNumber: faker.phone.number(),
+      name,
+      address,
+      phoneNumber,
     }
   },
 
-  setLocale: (locale: string) => {
-    console.log(locale)
-    faker.locale = (`${locale}`);
+  setLocale: (locale: string = 'USA') => {
+
+    faker.locale = (locales[locale]);
+  },
+
+  getLocale: (region: string) => {
+    return locales[region];
   },
 
   setSeed: (seed: number) => {
     faker.seed(seed);
   },
 
-  getUsers: (count: number, locale: string) => {
-    faker.locale = locale;
+  getUsers: (count: number, errorsCount: number, region: string) => {
     const result = [];
+    const locale = userService.getLocale(region);
 
     for (let i = 0; i < count; i++) {
-      result.push(userService.createRandomUser())
+      result.push(userService.createRandomUser(errorsCount, locale))
     }
 
     return result;

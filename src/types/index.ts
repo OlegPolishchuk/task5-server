@@ -1,22 +1,13 @@
 export type User = {
   id: string;
-  name: string,
-  address: {
-    country: string;
-    city: string;
-    street: string;
-    zipCode: string;
-    timeZone: string;
-  },
+  name: string;
+  address: string;
   phoneNumber: string;
 }
 
 
 export type DataQueryParams = {
-  currentRegion: {
-    title: string;
-    locale: string;
-  };
+  region: string;
   errorCount: number;
   seed: number;
   pageNumber: number;
