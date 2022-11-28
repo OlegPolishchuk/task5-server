@@ -1,6 +1,6 @@
 import {Router} from "express";
 import {userService} from "../domain/userService";
-import {DataQueryParams, User} from "../types";
+import {DataQueryParams} from "../types";
 
 export const appRouter = Router({});
 
@@ -13,7 +13,7 @@ appRouter.get('/', async (req, res) => {
 
   userService.setLocale(region);
   userService.setSeed(currentSeed);
-  const data = userService.getUsers(itemsCount, errorsCount, region);
+  const data = userService.getUsers(itemsCount, errorsCount, region, pageNumber);
 
   res.status(200).json(data)
 })

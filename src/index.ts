@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import {appRouter} from "./router/appRouter";
+import {downloadRouter} from "./router/downloadRouter";
 
 
 const app = express();
@@ -11,7 +12,8 @@ const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 
-app.get('/', appRouter)
+app.use('/', appRouter)
+app.use('/file',downloadRouter)
 
 const start = async () => {
   try {

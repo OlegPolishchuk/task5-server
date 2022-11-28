@@ -18,7 +18,9 @@ const locales: {[key: string]: string} = {
 
 export const userService = {
 
-  createRandomUser: (errorsCount: number, locale: string): User => {
+  _data: [] as User[],
+
+  createRandomUser(errorsCount: number, locale: string): User {
     let address = `${faker.address.city()} ${faker.address.streetName()}`;
     let name = faker.name.fullName();
     let phoneNumber = faker.phone.number();
@@ -75,25 +77,38 @@ export const userService = {
     }
   },
 
-  setLocale: (locale: string = 'USA') => {
+  get allData () {
+    return this._data
+  },
 
+  set allData(data) {
+    this._data = data;
+  },
+
+  setLocale(locale: string = 'USA') {
     faker.locale = (locales[locale]);
   },
 
-  getLocale: (region: string) => {
+  getLocale(region: string) {
     return locales[region];
   },
 
-  setSeed: (seed: number) => {
+  setSeed(seed: number) {
     faker.seed(seed);
   },
 
-  getUsers: (count: number, errorsCount: number, region: string) => {
-    const result = [];
-    const locale = userService.getLocale(region);
+  getUsers(count: number, errorsCount: number, region: string, pageNumber: number) {
+    const result: User[] = [];
+    const locale = this.getLocale(region);
 
     for (let i = 0; i < count; i++) {
-      result.push(userService.createRandomUser(errorsCount, locale))
+      result.push(this.createRandomUser(errorsCount, locale))
+    }
+
+    if (pageNumber === 0) {
+      this.allData = result
+    } else {
+      this.allData = this.allData.concat(result)
     }
 
     return result;
