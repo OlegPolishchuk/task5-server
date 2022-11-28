@@ -3,17 +3,16 @@ import ObjectsToCsv from "objects-to-csv";
 
 export const downloadService = {
   convertToCSV(data: User[]) {
-    (async ()=>{
-      try {
-        const csv = new ObjectsToCsv(data);
-
-        await csv.toDisk('./data.csv');
-
-        console.log(await csv.toString())
-      }
-      catch (e) {
-        console.log(e)
-      }
+    return (async () => {
+      const csv = new ObjectsToCsv(data);
+      return await csv.toDisk('./data.csv', {bom: true, append: true})
     })()
+
+  },
+
+  getCSVString(data: User[]) {
+    const csv = new ObjectsToCsv(data);
+
+    return csv.toString();
   },
 }
