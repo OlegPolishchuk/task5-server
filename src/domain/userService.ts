@@ -31,8 +31,6 @@ export const userService = {
       const permErrorsLength = permissibleErrors.length - 1;
 
       if (max % Math.floor(max) === 0) {
-        console.log(`${max} % ${max} === 0`, max % max)
-        console.log('errors count without 0.5')
         for (let i = 0; i < max; i++) {
           const randomIndex = getRandomDigit(0, permErrorsLength);
             name = permissibleErrors[randomIndex](name, locale);

@@ -12,14 +12,18 @@ downloadRouter.get('',async (req, res) => {
   console.log(allData)
   const data = await downloadService.convertToCSV(allData);
 
+
   const readStream = fs.createReadStream('./data.csv');
 
   readStream.on('data', (chunk) => {
-    res.status(200).send(chunk);
+    console.log(chunk)
+    // res.status(200).send(chunk);
   })
 
   readStream.on('end', () => {
-    fs.unlink('./data.csv', () => {})
+    res.status(200);
+    res.download('./data.csv')
+    // fs.unlink('./data.csv', () => {})
   })
 
 })
