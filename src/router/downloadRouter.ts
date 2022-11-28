@@ -13,9 +13,8 @@ downloadRouter.get('',async (req, res) => {
   const data = await downloadService.convertToCSV(allData);
 
   const readStream = fs.createReadStream('./data.csv');
+
   readStream.on('data', (chunk) => {
-    res.setHeader('Access-Control-Allow-Origin', '*')
-    res.setHeader('Access-Control-Expose-Headers','Content-Disposition')
     res.status(200).send(chunk);
   })
 
