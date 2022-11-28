@@ -14,6 +14,7 @@ downloadRouter.get('',async (req, res) => {
 
   const readStream = fs.createReadStream('./data.csv');
   readStream.on('data', (chunk) => {
+    res.setHeader('Access-Control-Expose-Headers','Content-Disposition')
     res.status(200).send(chunk);
   })
 

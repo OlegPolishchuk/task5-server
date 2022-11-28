@@ -6,11 +6,12 @@ import {downloadRouter} from "./router/downloadRouter";
 
 
 const app = express();
+app.use(cors( {origin: '*'}));
 dotenv.config();
 
 const PORT = process.env.PORT || 5000;
 
-app.use(cors( {origin: '*'}));
+
 
 app.use('/', appRouter)
 app.use('/file',downloadRouter)
