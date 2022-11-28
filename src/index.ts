@@ -11,6 +11,14 @@ dotenv.config();
 
 const PORT = process.env.PORT || 5000;
 
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+
+  // Request headers you wish to allow
+  res.setHeader('Access-Control-Allow-Headers', '*');
+
+  next();
+})
 
 
 app.use('/', appRouter)
