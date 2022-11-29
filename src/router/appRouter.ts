@@ -8,7 +8,9 @@ appRouter.get('/', async (req, res) => {
   // @ts-ignore
   const {region, errorsCount, seed, pageNumber, isFirst}: DataQueryParams = req.query;
 
+
   userService.setLocale(region);
+  userService.setSeed(Number(seed) + Number(pageNumber))
 
   const data = userService.generateUsers(errorsCount, region, pageNumber, isFirst, seed)
 

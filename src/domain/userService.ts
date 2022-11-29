@@ -4,6 +4,7 @@ import {removeRandomChar} from '../utils/removeRandomChar';
 import {addRandomChar} from "../utils/addRandomChar";
 import {shuffleChar} from "../utils/shuffleChar";
 import {getRandomDigit} from "../utils/getRandomDigit";
+import {create} from "domain";
 
 
 const permissibleErrors: Array<(string: string, locale: string) => string> = [shuffleChar, removeRandomChar, addRandomChar];
@@ -19,8 +20,10 @@ const locales: { [key: string]: string } = {
 export const userService = {
 
   _data: [] as User[],
+  _seed: null as null | number,
 
   createRandomUser(): User {
+
     return {
       id: faker.datatype.uuid(),
       name: faker.name.fullName(),
@@ -107,31 +110,66 @@ export const userService = {
   generateUsers(errorsCount: number, region: string, pageNumber: number, isFirst: string, seed: number) {
     if(isFirst === 'true'){
       this.allData = [] as User[];
+      this._seed = Number(seed)
     }
+
+    console.log(`real seed = ${Number(seed) + Number(pageNumber)}`)
+    console.log(`this.seed`, this._seed)
 
     this.setSeed(Number(seed) + Number(pageNumber))
 
     const locale = this.getLocale(region);
     const allDataLength = this.allData.length;
-
-    const count = Number(pageNumber) === 0
+    console.log(`allDataLength(${allDataLength}) === pageNumber(${pageNumber}) * 10 + 20  === 0  => ${allDataLength === Number(pageNumber) * 10 + 20}` )
+    let count = Number(pageNumber) === 0
       ? 20
       : allDataLength === Number(pageNumber) * 10 + 20
         ? 0
         : 10
 
+    let startSeed = Number(seed);
+
+    if (this._seed !== Number(seed) + Number(pageNumber)) {
+      if (isFirst === 'true') {
+        this.setSeed(startSeed + Number(pageNumber))
+        count = 10;
+      }
+      else {
+        count = allDataLength === 0 ? 20 : allDataLength
+        this.setSeed(startSeed)
+      }
+    }
+
+
     const result: User[] = [];
 
+
     for (let i = 0; i < count; i++) {
+      if (count >= 30) {
+
+       if (i >= 20) {
+        if ( i % 10 === 0) {
+          startSeed += 1;
+          this.setSeed(startSeed)
+        }
+       }
+      }
+
       result.push(this.createRandomUser())
     }
 
     if (isFirst === 'true') {
       this.allData = result
     } else {
-
-      this.allData = Number(pageNumber) === 0 ? result : this.allData.concat(result)
+      if (this._seed !== Number(seed) + Number(pageNumber) ) {
+        this.allData = result
+      }
+      else {
+        this.allData = Number(pageNumber) === 0 ? result : this.allData.concat(result)
+      }
     }
+
+    this._seed = Number(seed) + Number(pageNumber) + 1;
 
     return this.getDataWithErrors(errorsCount, region)
   }
