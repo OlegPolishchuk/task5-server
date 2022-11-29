@@ -8,7 +8,8 @@ export type User = {
 
 export type DataQueryParams = {
   region: string;
-  errorCount: number;
+  errorsCount: number;
   seed: number;
   pageNumber: number;
+  isFirst: string;
 }
